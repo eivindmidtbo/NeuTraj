@@ -1,6 +1,6 @@
 import random
 import numpy as np
-import cPickle
+import pickle
 
 
 beijing_lat_range = [39.6,40.7]
@@ -74,7 +74,7 @@ class Preprocesser(object):
 
     def _traj2grid_preprocess(self, traj_feature_map, isCoordinate =False):
         trajs_hash = []
-        trajs_keys = traj_feature_map.keys()
+        trajs_keys = list(traj_feature_map.keys())
         for traj_key in trajs_keys:
             traj = traj_feature_map[traj_key]
             trajs_hash.append(self.traj2grid_seq(traj, isCoordinate))
@@ -83,7 +83,7 @@ class Preprocesser(object):
     def preprocess(self, traj_feature_map, isCoordinate = False):
         if not isCoordinate:
             traj_grids = self._traj2grid_preprocess(traj_feature_map)
-            print 'gird trajectory nums {}'.format(len(traj_grids))
+            print('gird trajectory nums {}'.format(len(traj_grids)))
 
             useful_grids = {}
             count = 0
@@ -92,12 +92,12 @@ class Preprocesser(object):
                 if len(traj) > max_len: max_len = len(traj)
                 count += len(traj)
                 for grid in traj:
-                    if useful_grids.has_key(grid):
+                    if grid in useful_grids:
                         useful_grids[grid][1] += 1
                     else:
                         useful_grids[grid] = [len(useful_grids) + 1, 1]
-            print len(useful_grids.keys())
-            print count, max_len
+            print(len(list(useful_grids.keys())))
+            print(count, max_len)
             return traj_grids, useful_grids, max_len
         elif isCoordinate:
             traj_grids = self._traj2grid_preprocess(traj_feature_map, isCoordinate = isCoordinate)
@@ -114,11 +114,11 @@ def trajectory_feature_generation(path ='./data/toy_trajs',
                                   lon_range = beijing_lon_range,
                                   min_length=50):
     fname = path.split('/')[-1].split('_')[0]
-    trajs  =  cPickle.load(open(path))
+    trajs  =  pickle.load(open(path))
     traj_index = {}
     max_len = 0
     preprocessor = Preprocesser(delta = 0.001, lat_range = lat_range, lon_range = lon_range)
-    print  preprocessor.get_grid_index((lon_range[1],lat_range[1]))
+    print(preprocessor.get_grid_index((lon_range[1],lat_range[1])))
     for i, traj in enumerate(trajs):
         new_traj = []
         coor_traj = []
@@ -134,24 +134,24 @@ def trajectory_feature_generation(path ='./data/toy_trajs',
                 coor_traj = preprocessor.traj2grid_seq(new_traj, isCoordinate=True)
                 # print coor_traj
                 if len(coor_traj)==0:
-                    print len(coor_traj)
+                    print(len(coor_traj))
                 if ((len(coor_traj) >10) & (len(coor_traj)<150)):
                     if len(traj) > max_len: max_len = len(traj)
                     traj_index[i] = new_traj
 
         if i%200==0:
-            print coor_traj
-            print i, len(traj_index.keys())
+            print(coor_traj)
+            print(i, len(list(traj_index.keys())))
     # print max_lat,max_lon,min_lat,min_lon
-    print max_len
-    print len(traj_index.keys())
+    print(max_len)
+    print(len(list(traj_index.keys())))
 
-    cPickle.dump(traj_index, open('./features/{}_traj_index'.format(fname),'w'))
+    pickle.dump(traj_index, open('./features/{}_traj_index'.format(fname),'w'))
 
     trajs, useful_grids, max_len = preprocessor.preprocess(traj_index, isCoordinate=True)
 
-    print trajs[0]
-    cPickle.dump((trajs,[],max_len), open('./features/{}_traj_coord'.format(fname), 'w'))
+    print(trajs[0])
+    pickle.dump((trajs,[],max_len), open('./features/{}_traj_coord'.format(fname), 'w'))
     # traj_grids = cPickle.load(open('./data_taxi/porto_traj_coord'))
     all_trajs_grids_xy = []
     min_x, min_y, max_x, max_y = 2000, 2000, 0, 0
@@ -166,7 +166,7 @@ def trajectory_feature_generation(path ='./data/toy_trajs',
                 min_y = y
             if y > max_y:
                 max_y = y
-    print min_x, min_y, max_x, max_y
+    print(min_x, min_y, max_x, max_y)
 
     for i in trajs:
         traj_grid_xy = []
@@ -177,9 +177,9 @@ def trajectory_feature_generation(path ='./data/toy_trajs',
             grids_xy = [y, x]
             traj_grid_xy.append(grids_xy)
         all_trajs_grids_xy.append(traj_grid_xy)
-    print all_trajs_grids_xy[0]
-    print len(all_trajs_grids_xy)
-    print all_trajs_grids_xy[0]
-    cPickle.dump((all_trajs_grids_xy,[],max_len), open('./features/{}_traj_grid'.format(fname), 'w'))
+    print(all_trajs_grids_xy[0])
+    print(len(all_trajs_grids_xy))
+    print(all_trajs_grids_xy[0])
+    pickle.dump((all_trajs_grids_xy,[],max_len), open('./features/{}_traj_grid'.format(fname), 'w'))
 
     return './features/{}_traj_coord'.format(fname), fname

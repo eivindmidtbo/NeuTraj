@@ -1,12 +1,12 @@
 import random
 import numpy as np
 import config
-import cPickle
+import pickle
 
 np.random.seed(2018)
 
 def random_sampling(train_seq_len, index):
-    sampling_index_list = random.sample(range(train_seq_len), config.sampling_num)
+    sampling_index_list = random.sample(list(range(train_seq_len)), config.sampling_num)
     return sampling_index_list
 
 def distance_sampling(distance, train_seq_len, index):
@@ -67,12 +67,12 @@ def top_n_sampling(distance, train_seq_len, index):
     return sample_index
 
 if __name__ == '__main__':
-    distance = cPickle.load(open('../features/discret_frechet_distance_all_600', 'r'))
-    print distance_sampling(distance, 100, 10)
-    print distance_sampling(distance, 100, 10)
+    distance = pickle.load(open('../features/discret_frechet_distance_all_600', 'r'))
+    print(distance_sampling(distance, 100, 10))
+    print(distance_sampling(distance, 100, 10))
 
-    print negative_distance_sampling(distance, 100, 10)
-    print negative_distance_sampling(distance, 100, 10)
+    print(negative_distance_sampling(distance, 100, 10))
+    print(negative_distance_sampling(distance, 100, 10))
 
-    print top_n_sampling(distance,100,10)
-    print top_n_sampling(distance,100,10)
+    print(top_n_sampling(distance,100,10))
+    print(top_n_sampling(distance,100,10))
