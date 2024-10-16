@@ -4,6 +4,8 @@ from torch.nn import Module, Parameter
 import torch
 from tools import config
 import numpy as np
+
+
 class WeightMSELoss(Module):
     def __init__(self, batch_size, sampling_num):
         super(WeightMSELoss, self).__init__()

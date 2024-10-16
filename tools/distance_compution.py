@@ -1,5 +1,5 @@
 import pickle
-import traj_dist.distance as  tdist
+import traj_dist.distance as tdist
 import numpy as  np
 import multiprocessing
 
